@@ -79,10 +79,27 @@
     return result;
 }
 
++ (double)runProgram:(id)program usingVariables:(NSDictionary *)variableValues
+{
+    double result = 0;
+    
+    return result;
+}
+
 + (NSString *)descriptionOfProgram:(id)program
 {
     NSString *description = @"";
     
     return description;
+}
+
++ (NSSet *)variablesUsedInProgram:(id)program
+{
+    return nil;
+}
+
++ (BOOL)isOperation:(NSString *)operation
+{
+    
 }
 @end
