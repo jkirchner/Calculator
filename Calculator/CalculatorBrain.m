@@ -15,6 +15,7 @@
 @implementation CalculatorBrain
 
 @synthesize operandStack = _operandStack;
+@synthesize program = _program;
 
 - (NSMutableArray *)operandStack
 {
@@ -22,6 +23,11 @@
         _operandStack = [[NSMutableArray alloc] init];
     
     return _operandStack;
+}
+
+- (id)program
+{
+    return [self.operandStack copy];
 }
 
 - (void)pushOperand:(double)operand
@@ -66,4 +72,17 @@
     return result;
 }
 
++ (double)runProgram:(id)program
+{
+    double result = 0;
+    
+    return result;
+}
+
++ (NSString *)descriptionOfProgram:(id)program
+{
+    NSString *description = @"";
+    
+    return description;
+}
 @end
