@@ -27,6 +27,20 @@
 
 - (IBAction)digitPressed:(UIButton *)sender 
 {
+    if ([sender.currentTitle isEqualToString:@"."]) {
+        if (self.userIsInTheMiddleOfEnteringANumber) {
+            NSString *display = self.display.text;
+            NSRange range = [display rangeOfString:@"."];
+            if (!(range.location == NSNotFound)) {
+                return;
+            }
+        } else {
+            self.display.text = @"0.";
+            self.userIsInTheMiddleOfEnteringANumber = YES;
+            return;
+        }
+        
+    }
     if (self.userIsInTheMiddleOfEnteringANumber) {
         self.display.text = [self.display.text stringByAppendingString:[sender currentTitle]];
     } else {
