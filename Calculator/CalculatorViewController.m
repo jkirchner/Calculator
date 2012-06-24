@@ -25,6 +25,13 @@
     return _brain;
 }
 
+- (IBAction)clear 
+{
+    self.brain = nil;
+    self.display.text = @"0";
+    self.userIsInTheMiddleOfEnteringANumber = NO;
+}
+
 - (IBAction)digitPressed:(UIButton *)sender 
 {
     if ([sender.currentTitle isEqualToString:@"."]) {

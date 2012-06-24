@@ -56,7 +56,8 @@
     } else if ([operation isEqualToString:@"Cos"]) {
         result = cos([self popOperand]);
     } else if ([operation isEqualToString:@"√"]) {
-        result = sqrt([self popOperand]);
+        double operand = [self popOperand];
+        if (operand > 0) result = sqrt(operand);
     } else if ([operation isEqualToString:@"π"]) {
         result = M_PI;
     }
