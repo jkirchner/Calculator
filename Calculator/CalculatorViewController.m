@@ -83,6 +83,11 @@
     }
 }
 
+- (IBAction)variablePressed:(UIButton *)sender 
+{
+    [self.brain pushVariable:sender.currentTitle];
+}
+
 - (IBAction)operationPressed:(UIButton *)sender 
 {
     if (self.userIsInTheMiddleOfEnteringANumber)
