@@ -137,12 +137,18 @@
         description = [topOfStack stringValue];
     else if ([topOfStack isKindOfClass:[NSString class]]) {
         if ([self isOperation:topOfStack]) {
+            NSLog(@"current operation is %@", topOfStack);
+            NSLog(@"remaining stack is %@", stack);
+            BOOL nextOperatationIsAddOrSubtract = [self nextOperationIsAddOrSubtract:stack];
             // check if the operation is a 2-input, 1-input, or no input operation and display correctly
             if ([[self twoOperandOperations] containsObject:topOfStack]) {
                 NSString *secondOperand = [self descriptionOfTopOfStack:stack];
                 NSString *firstOperand = [self descriptionOfTopOfStack:stack];
                 
                 description = [NSString stringWithFormat:@"(%@ %@ %@)", firstOperand, topOfStack, secondOperand];
+                
+                if (([topOfStack isEqualToString:@"*"] || [topOfStack isEqualToString:@"/"]) && nextOperatationIsAddOrSubtract)
+                    description = [self cleanUpParentheses:description];
             } else if ([[self oneOperandOperations] containsObject:topOfStack]) {
                 description = [NSString stringWithFormat:@"%@(%@)", topOfStack, [self cleanUpParentheses:[self descriptionOfTopOfStack:stack]]];
             } else {
@@ -174,6 +180,26 @@
     }
 
     return description;
+}
+
++ (BOOL)nextOperationIsAddOrSubtract:(id)stack
+{
+    NSMutableArray *programStack;
+    if ([stack isKindOfClass:[NSMutableArray class]]) 
+        programStack = [stack mutableCopy];
+    
+    while (programStack.count) {
+        id topOfStack = [programStack lastObject];
+        if (topOfStack) [programStack removeLastObject];
+        
+        if ([topOfStack isKindOfClass:[NSString class]]) {
+            if ([topOfStack isEqualToString:@"+"] || [topOfStack isEqualToString:@"-"]) {
+                return YES;
+            } else if ([self isOperation:topOfStack])
+                return NO;
+        }
+    }
+    return NO;
 }
 
 + (NSString *)cleanUpParentheses:(NSString *)description
