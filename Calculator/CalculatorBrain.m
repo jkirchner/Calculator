@@ -36,6 +36,14 @@
     [self.operandStack addObject:operandObject];
 }
 
+- (void)pushVariable:(NSString *)variable
+{
+    if ([variable isKindOfClass:[NSString class]]) {
+        if (![[self class] isOperation:variable]) 
+            [self.operandStack addObject:variable];
+    }
+}
+
 - (double)performOperation:(NSString *)operation
 {
     [self.operandStack addObject:operation];
