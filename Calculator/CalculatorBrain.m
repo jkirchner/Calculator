@@ -98,9 +98,33 @@
 
 + (double)runProgram:(id)program usingVariables:(NSDictionary *)variableValues
 {
-    double result = 0;
+    NSMutableArray *stack;
+    NSUInteger index = 0;
+    NSNumber *currentVariableValue = [[NSNumber alloc] initWithDouble:0];
     
-    return result;
+    if ([program isKindOfClass:[NSArray class]]) {
+        stack = [program mutableCopy];
+        NSSet *variablesInProgram = [self variablesUsedInProgram:stack];
+        
+        for (NSString *variable in variablesInProgram) {
+            index = 0;
+            currentVariableValue = [variableValues objectForKey:variable];
+            if (!currentVariableValue)
+                currentVariableValue = [NSNumber numberWithDouble:0];
+            for (id operand in [stack copy]) {
+                if ([operand isKindOfClass:[NSString class]]) {
+                    if (![self isOperation:operand]) {
+                        if ([operand isEqualToString:variable]) {
+                            [stack replaceObjectAtIndex:index withObject:currentVariableValue];
+                        }
+                    }
+                }
+                index ++;
+            }
+        }
+    }
+    
+    return [[self class] runProgram:stack];
 }
 
 + (NSString *)descriptionOfProgram:(id)program
