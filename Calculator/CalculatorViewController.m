@@ -86,8 +86,7 @@
 - (IBAction)variablePressed:(UIButton *)sender 
 {
     [self.brain pushVariable:sender.currentTitle];
-    self.history.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
-    [self updateVariableValuesDisplay];
+    [self runProgram];
 }
 
 - (IBAction)changeTestVariableValues:(UIButton *)sender 
@@ -97,7 +96,7 @@
     else if ([sender.currentTitle isEqualToString:@"Test 1"])
         self.testVariableValues = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithDouble:10], @"x", [NSNumber numberWithDouble:5], @"a", [NSNumber numberWithDouble:1], @"b", [NSNumber numberWithDouble:20], @"y", nil];
     else if ([sender.currentTitle isEqualToString:@"Test 2"])
-        self.testVariableValues = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithDouble:1], @"x", [NSNumber numberWithDouble:2], @"a", [NSNumber numberWithDouble:3], @"b", nil];
+        self.testVariableValues = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithDouble:1], @"x", [NSNumber numberWithDouble:2], @"a", @"*", @"b", nil];
     else if ([sender.currentTitle isEqualToString:@"Test 3"])
         self.testVariableValues = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithDouble:10], @"x", [NSNumber numberWithDouble:5], @"a", @"*", @"b", nil];
 
@@ -121,7 +120,6 @@
     }
     
     self.variableValues.text = variableDisplayString;
-
 }
 
 - (IBAction)operationPressed:(UIButton *)sender 
@@ -130,16 +128,34 @@
         [self enterPressed];
     
     [self.brain performOperation:sender.currentTitle];
-    self.history.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
-    self.display.text = [NSString stringWithFormat:@"%g", [CalculatorBrain runProgram:self.brain.program usingVariables:self.testVariableValues]];
+    [self runProgram];
 }
 
 - (IBAction)enterPressed 
 {
     [self.brain pushOperand:self.display.text.doubleValue];
     self.userIsInTheMiddleOfEnteringANumber = NO;
+    [self runProgram];
+}
+
+- (void)runProgram
+{
+    self.display.text = [NSString stringWithFormat:@"%g", [CalculatorBrain runProgram:self.brain.program usingVariableValues:self.testVariableValues]];
     self.history.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
     [self updateVariableValuesDisplay];
+}
+
+- (IBAction)undoPressed 
+{
+    if (self.userIsInTheMiddleOfEnteringANumber) {
+        [self backSpacePressed];
+        if ([self.display.text isEqualToString:@"0"])
+            [self runProgram];
+    }
+    else {
+        [self.brain removeTopOfProgram];
+        [self runProgram];
+    }
 }
 
 - (void)viewDidUnload {

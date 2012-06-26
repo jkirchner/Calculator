@@ -36,6 +36,11 @@
     [self.operandStack addObject:operandObject];
 }
 
+- (void)removeTopOfProgram
+{
+    if (self.operandStack) [self.operandStack removeLastObject];
+}
+
 - (void)pushVariable:(NSString *)variable
 {
     if ([variable isKindOfClass:[NSString class]]) {
@@ -95,7 +100,7 @@
     return [self popOperandOffProgramStack:stack];
 }
 
-+ (double)runProgram:(id)program usingVariables:(NSDictionary *)variableValues
++ (double)runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues
 {
     NSMutableArray *stack;
     NSUInteger index = 0;
