@@ -137,8 +137,6 @@
         description = [topOfStack stringValue];
     else if ([topOfStack isKindOfClass:[NSString class]]) {
         if ([self isOperation:topOfStack]) {
-            NSLog(@"current operation is %@", topOfStack);
-            NSLog(@"remaining stack is %@", stack);
             BOOL nextOperatationIsAddOrSubtract = [self nextOperationIsAddOrSubtract:stack];
             // check if the operation is a 2-input, 1-input, or no input operation and display correctly
             if ([[self twoOperandOperations] containsObject:topOfStack]) {
@@ -147,6 +145,7 @@
                 
                 description = [NSString stringWithFormat:@"(%@ %@ %@)", firstOperand, topOfStack, secondOperand];
                 
+                // if current operation is * or / and next operation is + or -, parentheses should be removed around the current description
                 if (([topOfStack isEqualToString:@"*"] || [topOfStack isEqualToString:@"/"]) && nextOperatationIsAddOrSubtract)
                     description = [self cleanUpParentheses:description];
             } else if ([[self oneOperandOperations] containsObject:topOfStack]) {
