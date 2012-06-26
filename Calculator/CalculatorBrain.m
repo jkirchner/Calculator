@@ -136,7 +136,31 @@
 
 + (NSSet *)variablesUsedInProgram:(id)program
 {
-    return nil;
+    NSMutableArray *stack;
+    if ([program isKindOfClass:[NSArray class]]) {
+        stack = [program mutableCopy];
+    }
+    
+    NSMutableSet *variables = [[NSMutableSet alloc] init];
+    
+    id topOfStack = [stack lastObject];
+    if (topOfStack) [stack removeLastObject];
+    
+    while (topOfStack) {
+        if ([topOfStack isKindOfClass:[NSString class]]) {
+            if (![self isOperation:topOfStack]) {
+                [variables addObject:topOfStack];
+            }
+        }
+        
+        topOfStack = [stack lastObject];
+        if (topOfStack) [stack removeLastObject];
+    }
+    
+    if ([variables count] == 0)
+        return nil;
+    else 
+        return [variables copy];
 }
 
 + (BOOL)isOperation:(NSString *)operation
