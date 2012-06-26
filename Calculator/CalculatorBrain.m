@@ -38,11 +38,9 @@
 
 - (double)performOperation:(NSString *)operation
 {
-    double result = 0;
-    
-    [self pushOperand:result];
-    
-    return result;
+    [self.operandStack addObject:operation];
+    return [[self class] runProgram:self.operandStack];
+    //return 0;
 }
 
 + (double)popOperandOffProgramStack:(NSMutableArray *)stack
