@@ -143,8 +143,8 @@
                 description = [NSString stringWithFormat:@"(%@ %@ %@)", [self descriptionOfTopOfStack:stack], topOfStack, secondOperand];
             } else if ([[self oneOperandOperations] containsObject:topOfStack]) {
                 description = [NSString stringWithFormat:@"%@(%@)", topOfStack, [self descriptionOfTopOfStack:stack]];
-            } else if ([[self operations] containsObject:topOfStack]) {
-                description = [NSString stringWithFormat:@"%@", topOfStack];
+            } else {
+                description = topOfStack;
             }
         } else {
             description = topOfStack;

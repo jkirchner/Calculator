@@ -30,13 +30,8 @@
 {
     self.brain = nil;
     self.display.text = @"0";
-    self.history.text = @"";
+    self.history.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
     self.userIsInTheMiddleOfEnteringANumber = NO;
-}
-
-- (void)printHistory:(NSString *)newOperation
-{
-    self.history.text = [self.history.text stringByAppendingFormat:@" %@", newOperation];
 }
 
 - (IBAction)backSpacePressed 
@@ -86,6 +81,7 @@
 - (IBAction)variablePressed:(UIButton *)sender 
 {
     [self.brain pushVariable:sender.currentTitle];
+    self.history.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
 }
 
 - (IBAction)operationPressed:(UIButton *)sender 
@@ -93,16 +89,16 @@
     if (self.userIsInTheMiddleOfEnteringANumber)
         [self enterPressed];
     
-    double result = [self.brain performOperation:sender.currentTitle];
-    [self printHistory:sender.currentTitle];
-    self.display.text = [NSString stringWithFormat:@"%g", result];
+    [self.brain performOperation:sender.currentTitle];
+    self.history.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
+    self.display.text = [NSString stringWithFormat:@"%g", [CalculatorBrain runProgram:self.brain.program]];
 }
 
 - (IBAction)enterPressed 
 {
     [self.brain pushOperand:self.display.text.doubleValue];
     self.userIsInTheMiddleOfEnteringANumber = NO;
-    [self printHistory:self.display.text];
+    self.history.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
 }
 
 - (void)viewDidUnload {
