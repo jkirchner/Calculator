@@ -109,7 +109,7 @@
 
 + (BOOL)isOperation:(NSString *)operation
 {
-    return NO;
+    return [[[self class] operations] containsObject:operation];
 }
 
 + (NSSet *)operations;
