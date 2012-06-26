@@ -140,9 +140,11 @@
             // check if the operation is a 2-input, 1-input, or no input operation and display correctly
             if ([[self twoOperandOperations] containsObject:topOfStack]) {
                 NSString *secondOperand = [self descriptionOfTopOfStack:stack];
-                description = [NSString stringWithFormat:@"(%@ %@ %@)", [self descriptionOfTopOfStack:stack], topOfStack, secondOperand];
+                NSString *firstOperand = [self descriptionOfTopOfStack:stack];
+                
+                description = [NSString stringWithFormat:@"(%@ %@ %@)", firstOperand, topOfStack, secondOperand];
             } else if ([[self oneOperandOperations] containsObject:topOfStack]) {
-                description = [NSString stringWithFormat:@"%@(%@)", topOfStack, [self descriptionOfTopOfStack:stack]];
+                description = [NSString stringWithFormat:@"%@(%@)", topOfStack, [self cleanUpParentheses:[self descriptionOfTopOfStack:stack]]];
             } else {
                 description = topOfStack;
             }
@@ -162,8 +164,25 @@
     if ([program isKindOfClass:[NSArray class]]) {
         stack = [program mutableCopy];
     }
+    while (stack.count) {
+        description = [description stringByAppendingString:[self descriptionOfTopOfStack:stack]];
+        description = [self cleanUpParentheses:description];
+        
+        if (stack.count)
+            description = [description stringByAppendingString:@", "];
 
-    return [self descriptionOfTopOfStack:stack];
+    }
+
+    return description;
+}
+
++ (NSString *)cleanUpParentheses:(NSString *)description
+{
+    // remove outer parentheses
+    if ([description hasPrefix:@"("] && [description hasSuffix:@")"])
+        description = [description substringWithRange:NSMakeRange(1, description.length-2)];
+    
+    return description;
 }
 
 + (NSSet *)variablesUsedInProgram:(id)program
