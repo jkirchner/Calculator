@@ -48,7 +48,6 @@
 {
     [self.operandStack addObject:operation];
     return [[self class] runProgram:self.operandStack];
-    //return 0;
 }
 
 + (double)popOperandOffProgramStack:(NSMutableArray *)stack
@@ -127,11 +126,44 @@
     return [[self class] runProgram:stack];
 }
 
-+ (NSString *)descriptionOfProgram:(id)program
++ (NSString *)descriptionOfTopOfStack:(NSMutableArray *)stack
 {
     NSString *description = @"";
     
+    id topOfStack = [stack lastObject];
+    if (topOfStack) [stack removeLastObject];
+    
+    if ([topOfStack isKindOfClass:[NSNumber class]])
+        description = [topOfStack stringValue];
+    else if ([topOfStack isKindOfClass:[NSString class]]) {
+        if ([self isOperation:topOfStack]) {
+            // check if the operation is a 2-input, 1-input, or no input operation and display correctly
+            if ([[self twoOperandOperations] containsObject:topOfStack]) {
+                NSString *secondOperand = [self descriptionOfTopOfStack:stack];
+                description = [NSString stringWithFormat:@"(%@ %@ %@)", [self descriptionOfTopOfStack:stack], topOfStack, secondOperand];
+            } else if ([[self oneOperandOperations] containsObject:topOfStack]) {
+                description = [NSString stringWithFormat:@"%@(%@)", topOfStack, [self descriptionOfTopOfStack:stack]];
+            } else if ([[self operations] containsObject:topOfStack]) {
+                description = [NSString stringWithFormat:@"%@", topOfStack];
+            }
+        } else {
+            description = topOfStack;
+        }
+    }
+    
     return description;
+}
+
++ (NSString *)descriptionOfProgram:(id)program
+{
+    NSMutableArray *stack;
+    NSString *description = @"";
+    
+    if ([program isKindOfClass:[NSArray class]]) {
+        stack = [program mutableCopy];
+    }
+
+    return [self descriptionOfTopOfStack:stack];
 }
 
 + (NSSet *)variablesUsedInProgram:(id)program
