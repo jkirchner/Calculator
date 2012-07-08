@@ -31,7 +31,7 @@
 
 - (IBAction)clear 
 {
-    self.brain = nil;
+    [self.brain clearProgramStack];
     self.display.text = @"0";
     self.history.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
     self.userIsInTheMiddleOfEnteringANumber = NO;
@@ -108,9 +108,9 @@
     NSString *variableDisplayString = @"";
     NSNumber *variableValue = [NSNumber numberWithDouble:0];
 
+    // reverse order here. Use testVariable values to keep the order the same each time.
     if (self.testVariableValues) {
         NSSet *variablesUsedInProgram = [CalculatorBrain variablesUsedInProgram:self.brain.program];
-        
         for (NSString *variable in variablesUsedInProgram) {
             variableValue = [NSNumber numberWithDouble:0];
             if ([self.testVariableValues objectForKey:variable]) variableValue = [self.testVariableValues objectForKey:variable];
@@ -120,6 +120,8 @@
     }
     
     self.variableValues.text = variableDisplayString;
+    self.display.text = [NSString stringWithFormat:@"%g", [CalculatorBrain runProgram:self.brain.program usingVariableValues:self.testVariableValues]];
+
 }
 
 - (IBAction)operationPressed:(UIButton *)sender 

@@ -30,6 +30,13 @@
     return [self.operandStack copy];
 }
 
+- (void)clearProgramStack
+{
+    if (self.operandStack) {
+        [self.operandStack removeAllObjects];
+    }
+}
+
 - (void)pushOperand:(double)operand
 {
     NSNumber *operandObject = [NSNumber numberWithDouble:operand];
