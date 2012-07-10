@@ -170,7 +170,7 @@
 
 + (NSString *)descriptionOfTopOfStack:(NSMutableArray *)stack
 {
-    NSString *description = @"";
+    NSString *description = @"0";
     
     id topOfStack = [stack lastObject];
     if (topOfStack) [stack removeLastObject];
