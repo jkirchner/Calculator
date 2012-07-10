@@ -59,13 +59,17 @@
 - (double)performOperation:(NSString *)operation
 {
     [self.operandStack addObject:operation];
-    return [[self class] runProgram:self.operandStack];
+    id result = [[self class] runProgram:self.operandStack];
+    if ([result isKindOfClass:[NSNumber class]]) {
+        return [result doubleValue];
+    } else {
+        return 0;
+    }
 }
 
-+ (double)popOperandOffProgramStack:(NSMutableArray *)stack
++ (id)popOperandOffProgramStack:(NSMutableArray *)stack
 {
     double result = 0;
-    
     id topOfStack = [stack lastObject];
     if (topOfStack) [stack removeLastObject];
 
@@ -74,32 +78,42 @@
         result = [topOfStack doubleValue];
     } else if ([topOfStack isKindOfClass:[NSString class]]){
         NSString *operation = topOfStack;
+        if ([self isOperation:operation]) {
+            <#statements#>
+        }
         if ([operation isEqualToString:@"+"]) {
-            result = [self popOperandOffProgramStack:stack] + [self popOperandOffProgramStack:stack];
+            result = [[self popOperandOffProgramStack:stack] doubleValue] + [[self popOperandOffProgramStack:stack] doubleValue];
         } else if ([operation isEqualToString:@"-"]) {
-            double subtractor = [self popOperandOffProgramStack:stack];
-            result = [self popOperandOffProgramStack:stack] - subtractor;
+            double subtractor = [[self popOperandOffProgramStack:stack] doubleValue];
+            result = [[self popOperandOffProgramStack:stack] doubleValue] - subtractor;
         } else if ([operation isEqualToString:@"*"]) {
-            result = [self popOperandOffProgramStack:stack] * [self popOperandOffProgramStack:stack];
+            result = [[self popOperandOffProgramStack:stack] doubleValue] * [[self popOperandOffProgramStack:stack] doubleValue];
         } else if ([operation isEqualToString:@"/"]) {
-            double divisor = [self popOperandOffProgramStack:stack];
-            if (divisor) result = [self popOperandOffProgramStack:stack] / divisor;
+            double divisor = [[self popOperandOffProgramStack:stack] doubleValue];
+            if (divisor) 
+                result = [[self popOperandOffProgramStack:stack] doubleValue] / divisor;
+            else 
+                // should the next operand be taken off the stack?
+                return @"Err: Div/0";
         } else if ([operation isEqualToString:@"Sin"]) {
-            result = sin([self popOperandOffProgramStack:stack]);
+            result = sin([[self popOperandOffProgramStack:stack] doubleValue]);
         } else if ([operation isEqualToString:@"Cos"]) {
-            result = cos([self popOperandOffProgramStack:stack]);
+            result = cos([[self popOperandOffProgramStack:stack] doubleValue]);
         } else if ([operation isEqualToString:@"√"]) {
-            double operand = [self popOperandOffProgramStack:stack];
-            if (operand > 0) result = sqrt(operand);
+            double operand = [[self popOperandOffProgramStack:stack] doubleValue];
+            if (operand > 0) 
+                result = sqrt(operand);
+            else
+                return [NSString stringWithFormat:@"Err: √(%g)",operand];
         } else if ([operation isEqualToString:@"π"]) {
             result = M_PI;
         }
     }
 
-    return result;
+    return [NSNumber numberWithDouble:result];
 }
 
-+ (double)runProgram:(id)program
++ (id)runProgram:(id)program
 {
     NSMutableArray *stack;
     if ([program isKindOfClass:[NSArray class]]) 
@@ -107,7 +121,7 @@
     return [self popOperandOffProgramStack:stack];
 }
 
-+ (double)runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues
++ (id)runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues
 {
     NSMutableArray *stack;
     NSUInteger index = 0;
@@ -135,7 +149,7 @@
         }
     }
     
-    return [[self class] runProgram:stack];
+    return [self runProgram:stack];
 }
 
 + (NSString *)descriptionOfTopOfStack:(NSMutableArray *)stack
@@ -254,6 +268,16 @@
 + (BOOL)isOperation:(NSString *)operation
 {
     return [[[self class] operations] containsObject:operation];
+}
+
++ (BOOL)isTwoOperandOperation:(NSString *)operation
+{
+    return [[[self class] twoOperandOperations] containsObject:operation];
+}
+
++ (BOOL)isOneOperandOperation:(NSString *)operation
+{
+    return [[[self class] oneOperandOperations] containsObject:operation];
 }
 
 + (NSSet *)operations;

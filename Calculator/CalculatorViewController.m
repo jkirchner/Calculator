@@ -3,7 +3,7 @@
 //  Calculator
 //
 //  Created by Jason Kirchner on 6/23/12.
-//  Copyright (c) 2012 Zen Motion Studio. All rights reserved.
+//  Copyright (c) 2012 Zen Motion Studio. All rights reserved.  
 //
 
 #import "CalculatorViewController.h"
@@ -120,7 +120,7 @@
     }
     
     self.variableValues.text = variableDisplayString;
-    self.display.text = [NSString stringWithFormat:@"%g", [CalculatorBrain runProgram:self.brain.program usingVariableValues:self.testVariableValues]];
+    self.display.text = [NSString stringWithFormat:@"%@", [CalculatorBrain runProgram:self.brain.program usingVariableValues:self.testVariableValues]];
 
 }
 
@@ -142,7 +142,6 @@
 
 - (void)runProgram
 {
-    self.display.text = [NSString stringWithFormat:@"%g", [CalculatorBrain runProgram:self.brain.program usingVariableValues:self.testVariableValues]];
     self.history.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
     [self updateVariableValuesDisplay];
 }
