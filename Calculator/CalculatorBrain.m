@@ -67,44 +67,52 @@
     }
 }
 
-+ (id)popOperandOffProgramStack:(NSMutableArray *)stack
++ (id)popOperandOffProgramStack:(NSMutableArray *)stack error:(NSError **)error
 {
     double result = 0;
     id topOfStack = [stack lastObject];
     if (topOfStack) [stack removeLastObject];
+
+    if (!topOfStack) {
+        NSMutableDictionary *errorDetail = [NSMutableDictionary dictionary];
+        [errorDetail setValue:@"Insufficient operands" forKey:NSLocalizedDescriptionKey];
+        *error = [NSError errorWithDomain:@"popOperandOffProgramStack" code:100 userInfo:errorDetail];
+    }
 
     if ([topOfStack isKindOfClass:[NSNumber class]])
     {
         result = [topOfStack doubleValue];
     } else if ([topOfStack isKindOfClass:[NSString class]]){
         NSString *operation = topOfStack;
-        if ([self isOperation:operation]) {
-            <#statements#>
-        }
         if ([operation isEqualToString:@"+"]) {
-            result = [[self popOperandOffProgramStack:stack] doubleValue] + [[self popOperandOffProgramStack:stack] doubleValue];
+            result = [[self popOperandOffProgramStack:stack error:error] doubleValue] + [[self popOperandOffProgramStack:stack error:error] doubleValue];
         } else if ([operation isEqualToString:@"-"]) {
-            double subtractor = [[self popOperandOffProgramStack:stack] doubleValue];
-            result = [[self popOperandOffProgramStack:stack] doubleValue] - subtractor;
+            double subtractor = [[self popOperandOffProgramStack:stack error:error] doubleValue];
+            result = [[self popOperandOffProgramStack:stack error:error] doubleValue] - subtractor;
         } else if ([operation isEqualToString:@"*"]) {
-            result = [[self popOperandOffProgramStack:stack] doubleValue] * [[self popOperandOffProgramStack:stack] doubleValue];
+            result = [[self popOperandOffProgramStack:stack error:error] doubleValue] * [[self popOperandOffProgramStack:stack error:error] doubleValue];
         } else if ([operation isEqualToString:@"/"]) {
-            double divisor = [[self popOperandOffProgramStack:stack] doubleValue];
+            double divisor = [[self popOperandOffProgramStack:stack error:error] doubleValue];
             if (divisor) 
-                result = [[self popOperandOffProgramStack:stack] doubleValue] / divisor;
-            else 
-                // should the next operand be taken off the stack?
-                return @"Err: Div/0";
+                result = [[self popOperandOffProgramStack:stack error:error] doubleValue] / divisor;
+            else {
+                NSMutableDictionary *errorDetail = [NSMutableDictionary dictionary];
+                [errorDetail setValue:@"Div/0" forKey:NSLocalizedDescriptionKey];
+                *error = [NSError errorWithDomain:@"popOperandOffProgramStack" code:200 userInfo:errorDetail];
+            }
         } else if ([operation isEqualToString:@"Sin"]) {
-            result = sin([[self popOperandOffProgramStack:stack] doubleValue]);
+            result = sin([[self popOperandOffProgramStack:stack error:error] doubleValue]);
         } else if ([operation isEqualToString:@"Cos"]) {
-            result = cos([[self popOperandOffProgramStack:stack] doubleValue]);
+            result = cos([[self popOperandOffProgramStack:stack error:error] doubleValue]);
         } else if ([operation isEqualToString:@"√"]) {
-            double operand = [[self popOperandOffProgramStack:stack] doubleValue];
+            double operand = [[self popOperandOffProgramStack:stack error:error] doubleValue];
             if (operand > 0) 
                 result = sqrt(operand);
-            else
-                return [NSString stringWithFormat:@"Err: √(%g)",operand];
+            else {
+                NSMutableDictionary *errorDetail = [NSMutableDictionary dictionary];
+                [errorDetail setValue:[NSString stringWithFormat:@"√(%g)", operand] forKey:NSLocalizedDescriptionKey];
+                *error = [NSError errorWithDomain:@"popOperandOffProgramStack" code:300 userInfo:errorDetail];
+            }
         } else if ([operation isEqualToString:@"π"]) {
             result = M_PI;
         }
@@ -115,10 +123,18 @@
 
 + (id)runProgram:(id)program
 {
+    NSError *error = nil;
     NSMutableArray *stack;
     if ([program isKindOfClass:[NSArray class]]) 
         stack = [program mutableCopy];
-    return [self popOperandOffProgramStack:stack];
+    
+    id result = [self popOperandOffProgramStack:stack error:&error];
+    if (error) {
+//        NSLog(@"%@", error.userInfo);
+        return [NSString stringWithFormat:@"Err: %@", [error.userInfo objectForKey:NSLocalizedDescriptionKey]];
+    }
+        
+    return result;
 }
 
 + (id)runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues
